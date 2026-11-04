@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f6f1">
+    <meta name="description" content="Search voter records by name, household number, or EPIC number.">
+    <title>Voter Search</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Voter Search home">
+          <span class="brand-mark" aria-hidden="true">V</span>
+          <span>Voter<span class="brand-light">Search</span></span>
+        </a>
+        <div class="topbar-note"><span class="live-dot"></span> Secure local lookup</div>
+      </header>
+
+      <section class="search-panel" aria-label="Voter search">
+        <div class="panel-topline">
+          <div>
+            <h2>Search voter records</h2>
+            <p>Results are limited to the selected dataset.</p>
+          </div>
+          <label class="dataset-field" for="dataset-id">Dataset <input id="dataset-id" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
+        </div>
+
+        <div class="search-modes" role="tablist" aria-label="Search type">
+          <button class="mode-button active" type="button" role="tab" aria-selected="true" data-type="name"><span aria-hidden="true">Aa</span> Name</button>
+          <button class="mode-button" type="button" role="tab" aria-selected="false" data-type="house"><span aria-hidden="true">⌂</span> House no.</button>
+          <button class="mode-button" type="button" role="tab" aria-selected="false" data-type="epic"><span aria-hidden="true">▤</span> EPIC number</button>
+        </div>
+
+        <form id="search-form" class="search-form">
+          <label class="search-input-wrap" for="search-query">
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="search-query" name="q" type="search" autocomplete="off" placeholder="Enter a voter name" maxlength="80" required>
+            <button id="clear-button" class="clear-button" type="button" aria-label="Clear search" hidden>×</button>
+          </label>
+          <button id="search-button" class="search-button" type="submit"><span>Search</span><span aria-hidden="true">→</span></button>
+        </form>
+        <div class="search-hint"><span class="hint-icon">i</span><span id="hint-text">Search starts after a short pause; enter a name in Latin or Hindi.</span></div>
+        <section class="device-access" aria-labelledby="device-access-title">
+          <div class="device-access-heading">
+            <h3 id="device-access-title">Device access</h3>
+            <span>One key · one browser</span>
+          </div>
+          <label for="access-key">Enter your 32-character access key</label>
+          <input id="access-key" type="password" minlength="32" maxlength="32" pattern="[A-Za-z0-9_-]{32}" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste your personal access key">
+          <label class="remember-key" for="remember-access-key">
+            <input id="remember-access-key" type="checkbox">
+            Remember key on this browser
+          </label>
+          <p>Each key is bound to the first browser profile that uses it. Use one exact site address (IP or hostname) consistently. Each phone/browser needs its own key.</p>
+        </section>
+        <details class="operator-settings">
+          <summary>Operator setting</summary>
+          <label for="vote-key">Vote-marking key <span>(required only to mark a voter)</span></label>
+          <input id="vote-key" type="password" autocomplete="off" placeholder="Enter server operator key">
+          <small>The key is sent only with a mark-voted request and is not saved.</small>
+        </details>
+      </section>
+
+      <section id="results-section" class="results-section" aria-live="polite" aria-busy="false">
+        <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+        <div class="results-heading" id="results-heading" hidden>
+          <div><p class="eyebrow">DIRECTORY RESULTS</p><h2 id="results-title">Matches</h2></div>
+          <span id="result-count" class="result-count"></span>
+        </div>
+        <div id="results" class="results-grid"></div>
+      </section>
+
+      <footer class="footer"><span>Voter Search</span><span>Use records only for authorized election administration.</span></footer>
+    </main>
+  </body>
+</html>
