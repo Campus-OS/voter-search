@@ -1,19 +1,15 @@
-const { Voter, Master } = require('../models');
+const mongoose = require('mongoose');
+const { Voter, Ward } = require('../models');
 const { approximateSubstringDistance, buildSearchFilter, normalizedCharacters } = require('./search-query');
 const { resolveSerialNumber } = require('./serial-number');
 const { transliterateNameToDevanagari } = require('./transliteration');
+const { buildWardQuery, createWardMap, getWardReference } = require('./ward-lookup');
 
 const VOTER_FIELDS = [
-  'dataset_id', 'ward_id', 'epic_no', 'name', 'relation_type', 'relation_name',
+  'dataset_id', 'ward_id', 'wardId', 'epic_no', 'name', 'relation_type', 'relation_name',
   'house_no', 'age', 'gender', 'part_no', 'serial_no', 'row_text', 'record_status',
   'review_status', 'source_page', 'raw_ocr_text', 'voted',
 ].join(' ');
-
-function normalizedWardId(value) {
-  if (value === undefined || value === null || value === '') return null;
-  const wardId = Number(value);
-  return Number.isSafeInteger(wardId) && wardId > 0 ? wardId : null;
-}
 
 async function searchVoters({ type, query, datasetId }) {
   const searchTerms = type === 'name'
@@ -40,23 +36,28 @@ async function searchVoters({ type, query, datasetId }) {
       .slice(0, limit)
       .map(({ voter }) => voter);
   }
-  const wardIds = [...new Set(voters.map((voter) => normalizedWardId(voter.ward_id)).filter((id) => id !== null))];
-  const masters = wardIds.length
-    ? await Master.find({ dataset_id: datasetId, id: { $in: wardIds } })
-      .select('dataset_id id booth_no name village_name ward_no contact_person notes').lean()
+  const wardQuery = buildWardQuery(voters, datasetId, mongoose.Types.ObjectId);
+  const wards = wardQuery
+    ? await Ward.find(wardQuery)
+      .select('_id dataset_id id booth_no name village_name ward_no contact_person notes').lean()
     : [];
-  const masterByWardId = new Map(masters
-    .map((master) => [normalizedWardId(master.id), master])
-    .filter(([id]) => id !== null)
-    .map(([id, master]) => [String(id), master]));
+  const wardByReference = createWardMap(wards);
 
   return voters.map((voter) => {
-    const wardId = normalizedWardId(voter.ward_id);
-    const master = wardId === null ? null : masterByWardId.get(String(wardId));
+    const wardReference = getWardReference(voter);
+    const wardDocument = wardReference ? wardByReference.get(wardReference.key) : null;
+    const wardDetails = wardDocument ? {
+      booth_no: wardDocument.booth_no,
+      name: wardDocument.name,
+      village_name: wardDocument.village_name,
+      ward_no: wardDocument.ward_no,
+      contact_person: wardDocument.contact_person,
+      notes: wardDocument.notes,
+    } : null;
     return {
       key: String(voter._id),
       dataset_id: voter.dataset_id,
-      ward_id: voter.ward_id,
+      ward_id: voter.ward_id ?? voter.wardId,
       epic_no: voter.epic_no,
       name: voter.name,
       relation_type: voter.relation_type,
@@ -72,14 +73,7 @@ async function searchVoters({ type, query, datasetId }) {
       source_page: voter.source_page,
       raw_ocr_text: voter.raw_ocr_text,
       already_voted: voter.voted === true,
-      master: master ? {
-        booth_no: master.booth_no,
-        name: master.name,
-        village_name: master.village_name,
-        ward_no: master.ward_no,
-        contact_person: master.contact_person,
-        notes: master.notes,
-      } : null,
+      ward: wardDetails,
     };
   });
 }

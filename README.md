@@ -10,7 +10,7 @@ A one-page voter lookup app built with Node.js, Express, MongoDB/Mongoose, and v
 ## Setup
 
 1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env`, replace the MongoDB URI placeholders with your connection string, and set `MONGODB_DB` and collection names to the exact names in your database.
+2. Copy `.env.example` to `.env`, replace the MongoDB URI placeholders with your connection string, and set `MONGODB_DB`, `VOTERS_COLLECTION`, and `WARD_COLLECTION` to the exact names in your database. The ward collection defaults to `wards`.
 3. Set `DEFAULT_DATASET_ID` to your active dataset. Search also supports choosing a dataset on the page.
 4. Generate the 10 per-user device keys with `npm run access-keys:generate`. It stores the distributable 32-character secrets in `.device-access-keys.generated.json` and the corresponding SHA-256 hashes in `.device-access-key-hashes.json`. Both files are excluded from Git. Securely give one key to each user and copy the hash file to the server. Each key binds to the first browser profile that successfully searches. Set a separate random `VOTE_API_KEY` (at least 24 characters) in `.env` for vote marking.
 5. Start with `npm start` and open `http://localhost:3000`.
@@ -25,8 +25,8 @@ With a generated hash file, every environment requires a valid device key for se
 
 ## Data mapping
 
-- Voters default to the MongoDB `voters` collection; master/ward records default to `master`. Override these using `VOTERS_COLLECTION` and `MASTER_COLLECTION`.
-- Voter searches are scoped by `dataset_id`. Each voter's `ward_id` is matched to the master record's `id` within that dataset; booth, ward, village, contact, and notes are returned with that voter and shown in the result details/household rows.
+- Voters default to the MongoDB `voters` collection and ward records default to `wards`. Override these using `VOTERS_COLLECTION` and `WARD_COLLECTION`.
+- Each search fetches ward documents for the matching voters: `ward_id` or `wardId` MongoDB ObjectIds are joined to ward `_id`. Legacy numeric ward IDs continue to match `id` within the same dataset. Ward name, number, booth, village, contact, and notes are included as `ward` details on each voter and rendered on the results page.
 - Imported numeric voter `_id` values are preserved. Search responses include a non-displayed action key so the UI can request the mark-voted operation.
 - When available, a four-digit number in `row_text` is used as the displayed serial number (including leading zeros); otherwise the existing `serial_no` is shown. `row_text` is also available in the expanded voter details.
 - The mark-voted route sets `voted: true` and `voted_at` on a voter record. `voted_at` is never shown. The update is atomic; a repeat returns HTTP 409 and “Already voted.”

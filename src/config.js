@@ -8,7 +8,7 @@ const envSchema = z.object({
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   MONGODB_DB: z.string().min(1).default('voter-records'),
   VOTERS_COLLECTION: z.string().default('voters'),
-  MASTER_COLLECTION: z.string().default('master'),
+  WARD_COLLECTION: z.string().default('wards'),
   DEFAULT_DATASET_ID: z.coerce.number().int().positive().default(1),
   SEARCH_RATE_LIMIT: z.coerce.number().int().positive().default(60),
   VOTE_RATE_LIMIT: z.coerce.number().int().positive().default(10),

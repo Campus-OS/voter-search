@@ -164,7 +164,7 @@ function addDetails(card, voter) {
   const details = el('details', 'card-details');
   details.append(el('summary', '', 'View full record details'));
   const grid = el('div', 'detail-grid');
-  const master = voter.master || {};
+  const master = voter.ward || voter.master || {};
   [
     ['Gender', voter.gender], ['Part no.', voter.part_no], ['Serial no.', voter.serial_no],
     ['Row text', voter.row_text],
@@ -237,8 +237,8 @@ function renderCard(voter) {
 function renderHousehold(voters) {
   const wrapper = el('div', 'house-table-wrap');
   const mastersByWard = new Map(voters
-    .filter((voter) => voter.master)
-    .map((voter) => [String(voter.ward_id), voter.master]));
+    .filter((voter) => voter.ward || voter.master)
+    .map((voter) => [String(voter.ward_id), voter.ward || voter.master]));
   const summary = el('div', 'household-summary');
   if (mastersByWard.size > 1) {
     summary.append(el('span', '', `${mastersByWard.size} wards matched; ward and booth are shown for each voter.`));
@@ -273,7 +273,7 @@ function renderHousehold(voters) {
       const cell = el('td', '', valueOrDash(value));
       cell.dataset.label = label;
       if (label === 'EPIC number') {
-        const master = voter.master || {};
+        const master = voter.ward || voter.master || {};
         const wardBooth = el('td', '', `${valueOrDash(master.ward_no)} / ${valueOrDash(master.booth_no)}`);
         wardBooth.dataset.label = 'Ward / booth';
         const wardName = el('td', '', valueOrDash(master.name));

@@ -7,7 +7,8 @@ const { Schema } = mongoose;
 const voterSchema = new Schema({
   _id: { type: Schema.Types.Mixed },
   dataset_id: Number,
-  ward_id: Number,
+  ward_id: Schema.Types.Mixed,
+  wardId: Schema.Types.Mixed,
   epic_no: String,
   name: String,
   relation_type: String,
@@ -30,7 +31,7 @@ voterSchema.index({ dataset_id: 1, name: 1 });
 voterSchema.index({ dataset_id: 1, house_no: 1 });
 voterSchema.index({ dataset_id: 1, epic_no: 1 });
 
-const masterSchema = new Schema({
+const wardSchema = new Schema({
   dataset_id: Number,
   id: Number,
   booth_no: Number,
@@ -39,9 +40,9 @@ const masterSchema = new Schema({
   ward_no: Number,
   contact_person: String,
   notes: String,
-}, { strict: false, collection: config.MASTER_COLLECTION });
+}, { strict: false, collection: config.WARD_COLLECTION });
 
-masterSchema.index({ dataset_id: 1, id: 1 });
+wardSchema.index({ dataset_id: 1, id: 1 });
 
 const deviceAccessKeySchema = new Schema({
   label: { type: String, required: true, trim: true },
@@ -58,6 +59,6 @@ deviceAccessKeySchema.index({ device_id: 1 }, {
 
 module.exports = {
   Voter: mongoose.model('Voter', voterSchema),
-  Master: mongoose.model('Master', masterSchema),
+  Ward: mongoose.model('Ward', wardSchema),
   DeviceAccessKey: mongoose.model('DeviceAccessKey', deviceAccessKeySchema),
 };

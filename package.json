@@ -9,7 +9,7 @@
     "dev": "node --watch src/server.js",
     "access-keys:generate": "node scripts/generate-device-access-keys.js",
     "test": "node --test",
-    "check": "node --check src/config.js && node --check src/server.js && node --check src/app.js && node --check src/routes/api.js && node --check src/services/search.js && node --check src/services/search-query.js && node --check src/services/transliteration.js && node --check src/services/serial-number.js && node --check src/services/device-access.js && node --check scripts/generate-device-access-keys.js && node --check public/app.js"
+    "check": "node --check src/config.js && node --check src/server.js && node --check src/app.js && node --check src/routes/api.js && node --check src/services/search.js && node --check src/services/search-query.js && node --check src/services/transliteration.js && node --check src/services/serial-number.js && node --check src/services/ward-lookup.js && node --check src/services/device-access.js && node --check scripts/generate-device-access-keys.js && node --check public/app.js"
   },
   "engines": {
     "node": ">=20"
