@@ -1,6 +1,4 @@
 node_modules/
-.device-access-keys.generated.json
-.device-access-key-hashes.json
 npm-debug.log*
 .DS_Store
 coverage/

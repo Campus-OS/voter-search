@@ -1,0 +1,10 @@
+pkg update && pkg upgrade -y
+pkg install nodejs-lts -y
+pkg install git -y
+git clone git@github.com:Campus-OS/voter-search.git
+
+cd voter-search
+
+npm i 
+npm run access-keys:generate
+npm start
